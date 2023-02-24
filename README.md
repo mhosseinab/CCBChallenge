@@ -9,7 +9,7 @@ Task
 ... which accepts json data from our customers and store certain parts of it to the filesystem.</br>
 Since this is a pretty simple task, we want you to think of best practices, edge cases and good software engineering.
 
-Please fork our repo and implement the challenge in `src/core/vehicle_features_api.py`.</br>
+Please fork our repo and implement the challenge in `src/core/challenge.py`.</br>
 Once you are done, just create a pull request to `base:develop`. Please leave a comment what you think about the task and how long it took you to finish.
 
 Run It
