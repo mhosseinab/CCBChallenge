@@ -54,7 +54,7 @@ class FileStorage:
             self.app.logger.error(f"Failed to write to file: {e}")
             return False
 
-    def delete_file(self, folder, file_name):
+    def delete_file(self, folder: str, file_name: str):
         """
         Delete the file with the given name in the folder.
         Args:
