@@ -8,20 +8,22 @@ class TestFileStorage(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client()
         self.client.testing = True
+        self.file_storage = FileStorage("uploads", context=self.app)
         pass
 
     def test_file_creation(self):
         """
-        Test the file creation functionality of the FileStorage class.
-        This includes testing both successful file creation and failure scenarios.
+        Test the file creation and deletion functionality of the FileStorage class.
         """
-        file_storage = FileStorage("uploads", context=self.app)
-        full_path = file_storage.get_full_path("test", "test.txt")
+        full_path = self.file_storage.get_full_path("test", "test.txt")
         self.assertEqual(str(full_path), "uploads/test/test.txt")
-        self.assertEqual(file_storage.save_file("test", "test.txt", b"test"), True)
+        self.assertEqual(self.file_storage.save_file("test", "test.txt", b"test"), True)
+        self.assertEqual(self.file_storage.delete_file("test", "test.txt"), True)
 
+    def test_file_creation_failure(self):
+        """
+        Test failure scenarios for the file creation functionality of the FileStorage class.
+        """
         # Test failure case
-        self.assertEqual(file_storage.save_file("../../../../../root", "test.txt", b"test"), False)
-        self.assertEqual(file_storage.delete_file("../../../../../root", "test.txt"), False)
-
-        self.assertEqual(file_storage.delete_file("test", "test.txt"), True)
+        self.assertEqual(self.file_storage.save_file("../../../../../root", "test.txt", b"test"), False)
+        self.assertEqual(self.file_storage.delete_file("../../../../../root", "test.txt"), False)
