@@ -2,9 +2,7 @@ from pathlib import Path
 
 from flask import current_app as app
 
-from ..config import ROOT_PATH
-
-DEFAULT_PATH = Path(ROOT_PATH, 'uploads')
+from config import UPLOADS_PATH as DEFAULT_PATH
 
 
 class FileStorage:
@@ -18,7 +16,7 @@ class FileStorage:
         self.path = path
         self.app = context
 
-    def get_full_path(self, folder, file_name):
+    def get_full_path(self, folder: str, file_name: str):
         """
         Get the full path to a file in the folder with the given name.
         Args:
@@ -28,9 +26,9 @@ class FileStorage:
         Returns:
             Path: The full path to the file
         """
-        return self.path / Path(folder) / Path(file_name)
+        return Path(self.path, folder, file_name)
 
-    def save_file(self, folder, file_name, content):
+    def save_file(self, folder: str, file_name: str, content: bytes):
         """
         Save the content to a file in the folder with the given name.
         Args:
@@ -43,12 +41,12 @@ class FileStorage:
         """
         # Create the full path to the file
         full_path = self.get_full_path(folder, file_name)
-        # Ensure the directory exists
-        full_path.parent.mkdir(parents=True, exist_ok=True)
-
         try:
+            # Ensure the directory exists
+            full_path.parent.mkdir(parents=True, exist_ok=True)
+
             # Write the content to the file
-            with open(full_path, 'w') as file:
+            with open(full_path, 'wb') as file:
                 file.write(content)
             self.app.logger.debug(f"Saved: {full_path}")
             return True
