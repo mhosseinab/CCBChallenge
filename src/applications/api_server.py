@@ -1,8 +1,26 @@
 import click
+import logging
+from os import getenv as os_getenv
 from flask import Flask
 from flask_cors import CORS
 
 from core.challenge_api import api as backend_challenge_api
+
+
+def create_app():
+    """
+    Create a Flask app with the backend_challenge_api blueprint.
+    Returns:
+        Flask: The Flask app
+    """
+    app = Flask("Backend Challenge API")
+    CORS(app)
+    app.register_blueprint(backend_challenge_api, url_prefix="/backend")
+
+    log_level = os_getenv('LOG_LEVEL', 'DEBUG')
+
+    app.logger.setLevel(getattr(logging, log_level))
+    return app
 
 
 @click.group(name="api-server")
@@ -35,7 +53,5 @@ def vehicle_features(host: str, port: int):
         host: The hostname to listen on.
         port: The port of the webserver.
     """
-    app = Flask("Backend Challenge API")
-    CORS(app)
-    app.register_blueprint(backend_challenge_api, url_prefix="/backend")
+    app = create_app()
     app.run(host=host, port=port, debug=True)
