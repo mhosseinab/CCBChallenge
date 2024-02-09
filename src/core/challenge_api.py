@@ -1,4 +1,9 @@
-from flask import Blueprint, make_response
+from json import dumps as json_dumps
+from flask import Blueprint, make_response, request, jsonify
+from jsonschema import validate, ValidationError, Draft7Validator
+
+from storage.file_storage import FileStorage
+from utils.schema import load_schema
 from utils.api_decorators import ApiDecorators
 
 api = Blueprint("challenge_api", __name__)
@@ -8,16 +13,23 @@ api = Blueprint("challenge_api", __name__)
 @ApiDecorators.require_customer_id
 def vehicle_features_post(user_id: str):
     """
-    Please see the README.md
-    Also see `json/vehicle-features.v1.schema.json` and `json/vehicle-features.v1.example.json`
-
-    Customers will post some json data to this route, and we want to store each `Vehicle` in the `Vehicle-List` to a single file.
-    This file should be stored to a folder named like the `user_id` and the filename should be the `id` with a ".json" extension.
-
-    :param user_id: The id of the customer sending the request
-    :return: ???
+    Save the request data to a file.
     """
 
-    # TODO Implement the challenge
+    data = request.get_json()
 
+    try:
+        # Validate the data against the schema
+        validate(instance=data, schema=load_schema("vehicle-features.v1.schema.json"), cls=Draft7Validator)
+    except ValidationError as e:
+        # If the data is not valid, return a 400 response with the validation error message
+        return jsonify({"error": str(e)}), 400
+
+    # Save the data to a file
+    store = FileStorage()
+    folder_name = user_id
+    for vehicle in data.get("vehicles", []):
+        file_name = f"{vehicle.get('id')}.json"
+        if not store.save_file(folder_name, file_name, json_dumps(data, indent=2).encode()):
+            return make_response("Failed to save data", 500)
     return make_response("OK", 200)

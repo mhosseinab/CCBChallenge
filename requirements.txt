@@ -5,6 +5,7 @@ black==22.3.0
 click
 flask<=2.1.3
 flask_cors
+jsonschema
 
 # Test Dependencies
 mock
