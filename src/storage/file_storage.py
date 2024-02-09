@@ -16,7 +16,7 @@ class FileStorage:
         self.path = path
         self.app = context
 
-    def get_full_path(self, folder: str, file_name: str):
+    def get_full_path(self, folder: str, file_name: str) -> Path:
         """
         Get the full path to a file in the folder with the given name.
         Args:
@@ -28,7 +28,7 @@ class FileStorage:
         """
         return Path(self.path, folder, file_name)
 
-    def save_file(self, folder: str, file_name: str, content: bytes):
+    def save_file(self, folder: str, file_name: str, content: bytes) -> bool:
         """
         Save the content to a file in the folder with the given name.
         Args:
@@ -46,7 +46,7 @@ class FileStorage:
             full_path.parent.mkdir(parents=True, exist_ok=True)
 
             # Write the content to the file
-            with open(full_path, 'wb') as file:
+            with open(full_path, "wb") as file:
                 file.write(content)
             self.app.logger.debug(f"Saved: {full_path}")
             return True
@@ -54,7 +54,7 @@ class FileStorage:
             self.app.logger.error(f"Failed to write to file: {e}")
             return False
 
-    def delete_file(self, folder: str, file_name: str):
+    def delete_file(self, folder: str, file_name: str) -> bool:
         """
         Delete the file with the given name in the folder.
         Args:
