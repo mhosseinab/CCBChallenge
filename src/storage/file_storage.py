@@ -46,7 +46,7 @@ class FileStorage:
             full_path.parent.mkdir(parents=True, exist_ok=True)
 
             # Write the content to the file
-            with open(full_path, "wb") as file:
+            with open(str(full_path), "wb") as file:
                 file.write(content)
             self.app.logger.debug(f"Saved: {full_path}")
             return True
