@@ -23,6 +23,10 @@ def create_app():
     return app
 
 
+# Create an instance of the Flask application
+app = create_app()
+
+
 @click.group(name="api-server")
 def cli():
     pass
@@ -53,5 +57,4 @@ def vehicle_features(host: str, port: int):
         host: The hostname to listen on.
         port: The port of the webserver.
     """
-    app = create_app()
     app.run(host=host, port=port, debug=True)
