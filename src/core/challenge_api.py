@@ -8,6 +8,9 @@ from utils.api_decorators import ApiDecorators
 
 api = Blueprint("challenge_api", __name__)
 
+# Load the schema once when the module is imported
+VEHICLE_FEATURES_SCHEMA = load_schema("vehicle-features.v1.schema.json")
+
 
 @api.route("/challenge", methods=["POST"])
 @ApiDecorators.require_customer_id
@@ -20,7 +23,7 @@ def vehicle_features_post(user_id: str):
 
     try:
         # Validate the data against the schema
-        validate(instance=data, schema=load_schema("vehicle-features.v1.schema.json"), cls=Draft7Validator)
+        validate(instance=data, schema=VEHICLE_FEATURES_SCHEMA, cls=Draft7Validator)
     except ValidationError as e:
         # If the data is not valid, return a 400 response with the validation error message
         return jsonify({"error": str(e)}), 400
