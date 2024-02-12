@@ -62,3 +62,17 @@ class TestVehicleFeaturesPost(unittest.TestCase):
 
             # Assert that the response status code is 500 (Internal Server Error)
             self.assertEqual(response.status_code, 500)
+
+    def test_vehicle_features_post_invalid_json(self):
+        # Define a string that is not valid JSON
+        post_data = "{invalid: data}"
+
+        # Send a POST request to the /challenge endpoint
+        response = self.client.post(
+            ENDPOINT,
+            data=post_data,
+            content_type="application/json",
+        )
+
+        # Assert that the response status code is 400 (Bad Request)
+        self.assertEqual(response.status_code, 400)
