@@ -27,13 +27,11 @@ class TestFileStorage(unittest.TestCase):
         self.assertEqual(self.file_storage.delete_file("test", "test.txt"), True)
         mock_unlink.assert_called_once()
 
-    @mock.patch("builtins.open", new_callable=mock.mock_open, read_data=b"test")
+    @mock.patch("builtins.open", side_effect=PermissionError())
     def test_file_creation_failure(self, mock_file):
         """
         Test failure scenarios for the file creation functionality of the FileStorage class.
         """
         # Test failure case
         self.assertEqual(self.file_storage.save_file("/root", "test.txt", b"test"), False)
-        mock_file.assert_not_called()
         self.assertEqual(self.file_storage.delete_file("/root", "test.txt"), False)
-        mock_file.assert_not_called()

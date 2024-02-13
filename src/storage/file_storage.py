@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from flask import current_app as app
+from werkzeug.utils import secure_filename
 
 from config import UPLOADS_PATH as DEFAULT_PATH
 
@@ -26,7 +27,7 @@ class FileStorage:
         Returns:
             Path: The full path to the file
         """
-        return Path(self.path, folder, file_name)
+        return Path(self.path, secure_filename(folder), secure_filename(file_name))
 
     def save_file(self, folder: str, file_name: str, content: bytes) -> bool:
         """
