@@ -1,6 +1,7 @@
 import unittest
 from unittest import mock
 from pathlib import Path
+from uuid import uuid4
 
 from src.applications.api_server import create_app
 from src.storage.file_storage import FileStorage
@@ -22,16 +23,41 @@ class TestFileStorage(unittest.TestCase):
         """
         full_path = self.file_storage.get_full_path("test", "test.txt")
         self.assertEqual(str(full_path), "uploads/test/test.txt")
-        self.assertEqual(self.file_storage.save_file("test", "test.txt", b"test"), True)
+        self.assertTrue(self.file_storage.save_file("test", "test.txt", b"test"))
         mock_file.assert_called_once_with("uploads/test/test.txt", "wb")
-        self.assertEqual(self.file_storage.delete_file("test", "test.txt"), True)
+        self.assertTrue(self.file_storage.delete_file("test", "test.txt"))
         mock_unlink.assert_called_once()
 
     @mock.patch("builtins.open", side_effect=PermissionError())
-    def test_file_creation_failure(self, mock_file):
+    def test_file_creation_failure(self, _):
         """
         Test failure scenarios for the file creation functionality of the FileStorage class.
         """
         # Test failure case
-        self.assertEqual(self.file_storage.save_file("/root", "test.txt", b"test"), False)
-        self.assertEqual(self.file_storage.delete_file("/root", "test.txt"), False)
+        self.assertFalse(self.file_storage.save_file("/root", "test.txt", b"test"))
+        self.assertFalse(self.file_storage.delete_file("/root", "test.txt"))
+
+    @mock.patch('pathlib.Path.unlink', side_effect=PermissionError())
+    def test_file_delete_failure(self, mock_unlink):
+        """
+        Test failure scenarios for the file creation functionality of the FileStorage class.
+        """
+        self.assertFalse(self.file_storage.delete_file("/root", "test.txt"))
+        mock_unlink.assert_called_once()
+
+    @mock.patch("builtins.open", side_effect=PermissionError())
+    @mock.patch('pathlib.Path.mkdir')
+    def test_folder_creation(self, mock_mkdir, _):
+        """
+        Test the folder creation functionality of the FileStorage class.
+        """
+        self.file_storage.save_file(str(uuid4()), "test.txt", b"test")
+        mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
+
+    @mock.patch('pathlib.Path.mkdir', side_effect=PermissionError())
+    def test_folder_creation_failure(self, mock_mkdir):
+        """
+        Test the folder creation functionality of the FileStorage class.
+        """
+        self.file_storage.save_file(str(uuid4()), "test.txt", b"test")
+        mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
